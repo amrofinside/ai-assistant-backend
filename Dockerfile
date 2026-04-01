@@ -29,4 +29,5 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Production-ready command using Gunicorn + Uvicorn workers
-CMD ["sh", "-c", "gunicorn api.app:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT"]
+# CMD ["sh", "-c", "gunicorn api.app:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT"]
+CMD ["gunicorn", "api.app:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:$PORT", "--workers", "1", "--timeout", "120"]
