@@ -1,14 +1,24 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import logging
 from db.dp import PG_DB
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
 from config.secrets import postgres_db_url
 
 # PostgreSQL Database
 pgdb = PG_DB(postgres_db_url)
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (you can replace "*" with your frontend URL in production for security)
+    allow_credentials=True,
+    allow_methods=["*"],  # This allows the OPTIONS method as well
+    allow_headers=["*"],
+)
 
 # Models
 class SessionUpdateRequest(BaseModel):
@@ -64,7 +74,7 @@ def get_session_endpoint(session_id: str):
     session = pgdb.get_session(session_id)
 
     if not session:
-        logging.info("Get seeion ID: Session not found")
+        logging.info("Get session ID: Session not found")
         raise HTTPException(status_code=404, detail="Session not found")
     
     logging.info(f"Get session: {session_id}")
