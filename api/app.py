@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from config.secrets import postgres_db_url
 
 # PostgreSQL Database
-pgdb = PG_DB(db_url)
+pgdb = PG_DB(postgres_db_url)
 
 app = FastAPI()
 
