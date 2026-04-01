@@ -3,16 +3,10 @@ import logging
 from db.dp import PG_DB
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
-from config.secrets import postgres_user, postgres_password, postgres_db, postgres_port, postgres_host
+from config.secrets import postgres_db_url
 
 # PostgreSQL Database
-pgdb = PG_DB(
-    host=postgres_host,
-    port=postgres_port,
-    database=postgres_db,
-    user=postgres_user,
-    password=postgres_password
-)
+pgdb = PG_DB(db_url)
 
 app = FastAPI()
 

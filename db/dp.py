@@ -3,14 +3,8 @@ from datetime import datetime, timezone
 
 
 class PG_DB:
-    def __init__(self, host, port, database, user, password):
-        conn = psycopg2.connect(
-            host=host,
-            port=port,
-            database=database,
-            user=user,
-            password=password
-        )
+    def __init__(self, db_url):
+        conn = psycopg2.connect(db_url)
         conn.autocommit = True
         self.cursor = conn.cursor()
 
