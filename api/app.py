@@ -89,11 +89,6 @@ def submit_lead(req: LeadRequest):
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
 
-    # Only update session-specific data (if any)
-    session_data = {k: v for k, v in req.data.items() if k in ["entry_flow", "case_type", "scope", "role", "urgency", "geographic_area", "metadata"]}
-    if session_data:
-        pgdb.update_session(req.session_id, session_data)
-
     # Insert the lead into the leads table
     pgdb.create_lead(req.session_id, req.data)
 
