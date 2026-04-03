@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from config.secrets import postgres_db_url, resend_api_key
+from config.configs import write_msg
 
 # Initialize
 pgdb = PG_DB(postgres_db_url)
@@ -92,24 +93,14 @@ def submit_lead(req: LeadRequest):
 
     # Insert the lead into the leads table
     pgdb.create_lead(req.session_id, req.data)
-
     logging.info(f"A lead saved")
 
-    email = resend.Emails.send({
-    "from": "onboarding@resend.dev",
-    "to": "myinside74@gmail.com",
-    "subject": "New Request",
-    "html": f"""
-        <p>You have received <strong>New Request</strong> from your <strong>AI Assistant</strong></p>
-        <p>Name: {req.data["name"]}</p>
-        <p>Company: {req.data["name"]}</p>
-        <p>Role: {req.data["name"]}</p>
-        <p>Telephone: {req.data["name"]}</p>
-        <p>Summary Notes: {req.data["name"]}</p>
-    """})
+    # Send messasge
+    msg_to_send = write_msg(session, req.data)
+    email = resend.Emails.send(msg_to_send)
 
     email_status = email['status']
-    logging.info(f"An Email is prepared. The email status is: {email_status}")
+    logging.info(f"An Email is sent. The email status is: {email_status}")
     
 
     return {
