@@ -101,12 +101,15 @@ def submit_lead(req: LeadRequest):
     email_id = email.get("id")
     if not email_id:
         logging.error(f"Failed to send email: {email}")
+        return {
+            "status": "success",
+            "email_status": "Failed"
+        }
     else:
         email_data = resend.Emails.get(email_id)
         email_status = email_data.get("last_event")
-        logging.info(f"Email {email_id} status: {status}")
-
-    return {
-        "status": "success",
-        "email_status": email_status
-    }
+        logging.info(f"Email {email_id} status: {email_status}")
+        return {
+            "status": "success",
+            "email_status": email_status
+        }
