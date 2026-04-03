@@ -5,7 +5,7 @@ from db.dp import PG_DB
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from config.secrets import postgres_db_url, resend_api_key, calendly_link
+from config.secrets import postgres_db_url, resend_api_key, calendly_url
 from config.configs import write_msg, write_customer_email
 
 # Initialize
@@ -108,7 +108,7 @@ def submit_lead(req: LeadRequest):
         logging.info(f"Email {email_id} status: {inside_email_status}")
     
     # Send Customer messasge
-    msg_to_send = write_customer_email(calendly_link, req.data)
+    msg_to_send = write_customer_email(calendly_url, req.data)
     email = resend.Emails.send(msg_to_send)
     email_id = email.get("id")
     if not email_id:
