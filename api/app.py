@@ -16,7 +16,7 @@ resend.api_key = resend_api_key
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (you can replace "*" with your frontend URL in production for security)
+    allow_origins=["*"],  # Allow all origins (To be replaced "*" with your frontend URL in production for security)
     allow_credentials=True,
     allow_methods=["*"],  # This allows the OPTIONS method as well
     allow_headers=["*"],
@@ -98,10 +98,13 @@ def submit_lead(req: LeadRequest):
     # Send messasge
     msg_to_send = write_msg(session, req.data)
     email = resend.Emails.send(msg_to_send)
-
-    email_status = email['status']
-    logging.info(f"An Email is sent. The email status is: {email_status}")
-    
+    email_id = email.get("id")
+    if not email_id:
+        logging.error(f"Failed to send email: {email}")
+    else:
+        email_data = resend.Emails.get(email_id)
+        email_status = email_data.get("last_event")
+        logging.info(f"Email {email_id} status: {status}")
 
     return {
         "status": "success",
