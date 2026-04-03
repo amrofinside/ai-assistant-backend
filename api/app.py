@@ -5,8 +5,8 @@ from db.dp import PG_DB
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from config.secrets import postgres_db_url, resend_api_key
-from config.configs import write_msg
+from config.secrets import postgres_db_url, resend_api_key, calendly_link
+from config.configs import write_msg, write_customer_email
 
 # Initialize
 pgdb = PG_DB(postgres_db_url)
@@ -95,21 +95,33 @@ def submit_lead(req: LeadRequest):
     pgdb.create_lead(req.session_id, req.data)
     logging.info(f"A lead saved")
 
-    # Send messasge
+    # Send INSIDE messasge
     msg_to_send = write_msg(session, req.data)
     email = resend.Emails.send(msg_to_send)
     email_id = email.get("id")
     if not email_id:
         logging.error(f"Failed to send email: {email}")
-        return {
-            "status": "success",
-            "email_status": "Failed"
-        }
+        inside_email_status = "Failed"
     else:
         email_data = resend.Emails.get(email_id)
-        email_status = email_data.get("last_event")
-        logging.info(f"Email {email_id} status: {email_status}")
-        return {
-            "status": "success",
-            "email_status": email_status
-        }
+        inside_email_status = email_data.get("last_event")
+        logging.info(f"Email {email_id} status: {inside_email_status}")
+    
+    # Send Customer messasge
+    msg_to_send = write_customer_email(calendly_link, req.data)
+    email = resend.Emails.send(msg_to_send)
+    email_id = email.get("id")
+    if not email_id:
+        logging.error(f"Failed to send email: {email}")
+        customer_email_status = "Failed"
+    else:
+        email_data = resend.Emails.get(email_id)
+        customer_email_status = email_data.get("last_event")
+        logging.info(f"Email {email_id} status: {customer_email_status}")
+    
+    
+    return {
+        "status": "success",
+        "inside_email_status": inside_email_status,
+        "customer_email_status": customer_email_status
+    }

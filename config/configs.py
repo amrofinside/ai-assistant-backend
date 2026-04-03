@@ -1,5 +1,6 @@
+import urllib.parse
 
-def write_msg(session_data, lead_data):
+def write_msg_to_inside(session_data, lead_data):
     msg = {
         "from": "onboarding@resend.dev",
         "to": "myinside74@gmail.com",
@@ -49,4 +50,64 @@ def write_msg(session_data, lead_data):
         <strong>Il Tuo Sincero AI Assistant</strong>
         """
     }
+    return msg
+
+def generate_calendly_link(calendly_link, name, email):
+    params = {
+        "name": name,
+        "email": email
+    }
+    query_string = urllib.parse.urlencode(params)
+    return f"{calendly_link}?{query_string}"
+
+
+def write_customer_email(calendly_link, lead_data):
+    booking_link = generate_calendly_link(calendly_link, lead_data)
+
+    msg = {
+        "from": "onboarding@resend.dev",
+        "to": lead_data["email"],
+        "subject": "INSIDE - Prenota una call con il nostro team",
+        "html": f"""
+        <div style="font-family: Arial, sans-serif; line-height:1.5;">
+
+            <p>Ciao <strong>{lead_data["name"]}</strong>,</p>
+
+            <p>
+                Grazie per averci contattato! Abbiamo ricevuto la tua richiesta!
+            </p>
+
+            <p>
+                Per capire meglio le tue esigenze e mostrarti come possiamo aiutarti,
+                ti invitiamo a prenotare una breve call con uno dei nostri specialisti.
+            </p>
+
+            <p style="text-align:center; margin: 30px 0;">
+                <a href="{booking_link}" 
+                   style="
+                        background-color:#007BFF;
+                        color:white;
+                        padding:12px 20px;
+                        text-decoration:none;
+                        border-radius:5px;
+                        display:inline-block;
+                        font-weight:bold;
+                   ">
+                   📅 Prenota la tua call
+                </a>
+            </p>
+
+            <p>
+                La call durerà circa 45 minuti e sarà completamente senza impegno.
+            </p>
+
+            <p>
+                A presto,<br>
+                <strong>INSIDE</strong>
+            </p>
+
+        </div>
+        """
+    }
+
     return msg
